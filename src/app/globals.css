@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           font-semibold text-white bg-gradient-to-r from-primary to-primary-dark
+           rounded-lg transition-all duration-200
+           hover:shadow-lg hover:-translate-y-0.5
+           active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           font-semibold text-white bg-slate-500
+           rounded-lg transition-all duration-200
+           hover:bg-slate-600;
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+           font-semibold text-white bg-green-500
+           rounded-lg transition-all duration-200
+           hover:bg-green-600;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 text-base border-2 border-slate-200
+           rounded-lg bg-white transition-all duration-200
+           focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10
+           placeholder:text-slate-400;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm p-6;
+  }
+}
