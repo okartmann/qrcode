@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="QR-Code Generator - Erstellen Sie kostenlos QR-Codes für URLs, Text, WiFi, vCard und mehr.">
+    <meta name="keywords" content="QR-Code, Generator, kostenlos, URL, WiFi, vCard, erstellen">
+    <title>QR-Code.de - Kostenloser QR-Code Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-3 0h1v1h-1v-1zm1 1h1v1h-1v-1zm-1 1h1v1h-1v-1zm1 1h1v1h-1v-1zm1-1h1v1h-1v-1zm1 1h1v1h-1v-1zm0-2h1v1h-1v-1zm1 1h1v1h-1v-1z"/>
+                </svg>
+                <span class="logo-text">QR-Code.de</span>
+            </div>
+            <nav class="nav">
+                <a href="#generator" class="nav-link">Generator</a>
+                <a href="#features" class="nav-link">Funktionen</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>QR-Code Generator</h1>
+                <p class="hero-subtitle">Erstellen Sie kostenlos professionelle QR-Codes in Sekunden</p>
+            </div>
+        </section>
+
+        <section id="generator" class="generator-section">
+            <div class="container">
+                <div class="generator-wrapper">
+                    <div class="generator-options">
+                        <h2>QR-Code erstellen</h2>
+
+                        <div class="type-selector">
+                            <button class="type-btn active" data-type="url">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                </svg>
+                                URL
+                            </button>
+                            <button class="type-btn" data-type="text">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                                Text
+                            </button>
+                            <button class="type-btn" data-type="wifi">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+                                    <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                                    <line x1="12" y1="20" x2="12.01" y2="20"/>
+                                </svg>
+                                WiFi
+                            </button>
+                            <button class="type-btn" data-type="vcard">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                vCard
+                            </button>
+                            <button class="type-btn" data-type="email">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                E-Mail
+                            </button>
+                            <button class="type-btn" data-type="phone">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                Telefon
+                            </button>
+                        </div>
+
+                        <div class="input-forms">
+                            <!-- URL Form -->
+                            <div class="form-group active" id="form-url">
+                                <label for="url-input">URL eingeben</label>
+                                <input type="url" id="url-input" placeholder="https://beispiel.de" class="input-field">
+                            </div>
+
+                            <!-- Text Form -->
+                            <div class="form-group" id="form-text">
+                                <label for="text-input">Text eingeben</label>
+                                <textarea id="text-input" placeholder="Ihr Text hier..." class="input-field textarea"></textarea>
+                            </div>
+
+                            <!-- WiFi Form -->
+                            <div class="form-group" id="form-wifi">
+                                <label for="wifi-ssid">Netzwerkname (SSID)</label>
+                                <input type="text" id="wifi-ssid" placeholder="Mein WLAN" class="input-field">
+
+                                <label for="wifi-password">Passwort</label>
+                                <input type="text" id="wifi-password" placeholder="Passwort eingeben" class="input-field">
+
+                                <label for="wifi-encryption">Verschlüsselung</label>
+                                <select id="wifi-encryption" class="input-field">
+                                    <option value="WPA">WPA/WPA2</option>
+                                    <option value="WEP">WEP</option>
+                                    <option value="nopass">Keine</option>
+                                </select>
+                            </div>
+
+                            <!-- vCard Form -->
+                            <div class="form-group" id="form-vcard">
+                                <label for="vcard-name">Name</label>
+                                <input type="text" id="vcard-name" placeholder="Max Mustermann" class="input-field">
+
+                                <label for="vcard-phone">Telefon</label>
+                                <input type="tel" id="vcard-phone" placeholder="+49 123 456789" class="input-field">
+
+                                <label for="vcard-email">E-Mail</label>
+                                <input type="email" id="vcard-email" placeholder="max@beispiel.de" class="input-field">
+
+                                <label for="vcard-company">Firma</label>
+                                <input type="text" id="vcard-company" placeholder="Meine Firma GmbH" class="input-field">
+
+                                <label for="vcard-website">Website</label>
+                                <input type="url" id="vcard-website" placeholder="https://beispiel.de" class="input-field">
+                            </div>
+
+                            <!-- Email Form -->
+                            <div class="form-group" id="form-email">
+                                <label for="email-address">E-Mail-Adresse</label>
+                                <input type="email" id="email-address" placeholder="empfaenger@beispiel.de" class="input-field">
+
+                                <label for="email-subject">Betreff</label>
+                                <input type="text" id="email-subject" placeholder="Betreff eingeben" class="input-field">
+
+                                <label for="email-body">Nachricht</label>
+                                <textarea id="email-body" placeholder="Ihre Nachricht..." class="input-field textarea"></textarea>
+                            </div>
+
+                            <!-- Phone Form -->
+                            <div class="form-group" id="form-phone">
+                                <label for="phone-number">Telefonnummer</label>
+                                <input type="tel" id="phone-number" placeholder="+49 123 456789" class="input-field">
+                            </div>
+                        </div>
+
+                        <div class="customization">
+                            <h3>Anpassen</h3>
+                            <div class="color-options">
+                                <div class="color-option">
+                                    <label for="qr-color">QR-Code Farbe</label>
+                                    <input type="color" id="qr-color" value="#000000" class="color-picker">
+                                </div>
+                                <div class="color-option">
+                                    <label for="bg-color">Hintergrund</label>
+                                    <input type="color" id="bg-color" value="#ffffff" class="color-picker">
+                                </div>
+                            </div>
+                            <div class="size-option">
+                                <label for="qr-size">Größe: <span id="size-value">256</span>px</label>
+                                <input type="range" id="qr-size" min="128" max="512" value="256" class="size-slider">
+                            </div>
+                        </div>
+
+                        <button id="generate-btn" class="generate-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            QR-Code generieren
+                        </button>
+                    </div>
+
+                    <div class="generator-preview">
+                        <div class="preview-card">
+                            <h3>Vorschau</h3>
+                            <div id="qr-preview" class="qr-preview">
+                                <div class="placeholder">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-3 0h1v1h-1v-1zm1 1h1v1h-1v-1zm-1 1h1v1h-1v-1zm1 1h1v1h-1v-1zm1-1h1v1h-1v-1zm1 1h1v1h-1v-1zm0-2h1v1h-1v-1zm1 1h1v1h-1v-1z"/>
+                                    </svg>
+                                    <p>Ihr QR-Code erscheint hier</p>
+                                </div>
+                            </div>
+                            <div class="download-options" id="download-options" style="display: none;">
+                                <button id="download-png" class="download-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    PNG herunterladen
+                                </button>
+                                <button id="download-svg" class="download-btn secondary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    SVG herunterladen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <h2>Funktionen</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <h3>Sofort einsatzbereit</h3>
+                        <p>Erstellen Sie QR-Codes in Sekunden - ohne Anmeldung oder Software-Installation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <h3>100% Kostenlos</h3>
+                        <p>Alle Funktionen sind komplett kostenlos - ohne versteckte Kosten oder Limits.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </div>
+                        <h3>Hochauflösend</h3>
+                        <p>Exportieren Sie Ihre QR-Codes in hoher Qualität als PNG oder SVG.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                        </div>
+                        <h3>Anpassbar</h3>
+                        <p>Passen Sie Farben und Größe an Ihre Marke und Bedürfnisse an.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                                <line x1="12" y1="18" x2="12.01" y2="18"/>
+                            </svg>
+                        </div>
+                        <h3>Vielseitig</h3>
+                        <p>URLs, Text, WiFi-Zugänge, Visitenkarten, E-Mails und mehr.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                <path d="M2 12h20"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                        </div>
+                        <h3>Datenschutz</h3>
+                        <p>Ihre Daten bleiben bei Ihnen - alles wird lokal in Ihrem Browser verarbeitet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="faq-section">
+            <div class="container">
+                <h2>Häufig gestellte Fragen</h2>
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>Was ist ein QR-Code?</summary>
+                        <p>Ein QR-Code (Quick Response Code) ist ein zweidimensionaler Barcode, der Informationen speichert und von Smartphones und anderen Geräten gescannt werden kann. QR-Codes können URLs, Text, Kontaktdaten und vieles mehr enthalten.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Sind die QR-Codes wirklich kostenlos?</summary>
+                        <p>Ja! Alle QR-Codes, die Sie auf QR-Code.de erstellen, sind zu 100% kostenlos. Es gibt keine versteckten Kosten, keine Limits und keine Wasserzeichen.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Kann ich die QR-Codes kommerziell nutzen?</summary>
+                        <p>Ja, Sie können alle erstellten QR-Codes uneingeschränkt für private und kommerzielle Zwecke verwenden.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Welches Format sollte ich wählen - PNG oder SVG?</summary>
+                        <p>PNG eignet sich für die meisten Anwendungen wie Websites und Dokumente. SVG ist ideal für den Druck, da es ohne Qualitätsverlust skaliert werden kann.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Wie groß sollte mein QR-Code sein?</summary>
+                        <p>Die Mindestgröße hängt vom Scanabstand ab. Als Faustregel gilt: Der QR-Code sollte mindestens 2 cm × 2 cm groß sein. Für größere Abstände entsprechend größer.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Werden meine Daten gespeichert?</summary>
+                        <p>Nein. Alle QR-Codes werden direkt in Ihrem Browser generiert. Ihre Daten verlassen niemals Ihr Gerät und werden nicht auf unseren Servern gespeichert.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 13h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-3 0h1v1h-1v-1zm1 1h1v1h-1v-1zm-1 1h1v1h-1v-1zm1 1h1v1h-1v-1zm1-1h1v1h-1v-1zm1 1h1v1h-1v-1zm0-2h1v1h-1v-1zm1 1h1v1h-1v-1z"/>
+                        </svg>
+                        <span class="logo-text">QR-Code.de</span>
+                    </div>
+                    <p>Kostenloser QR-Code Generator für alle Ihre Bedürfnisse.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Links</h4>
+                    <a href="#generator">Generator</a>
+                    <a href="#features">Funktionen</a>
+                    <a href="#faq">FAQ</a>
+                </div>
+                <div class="footer-legal">
+                    <h4>Rechtliches</h4>
+                    <a href="#">Impressum</a>
+                    <a href="#">Datenschutz</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 QR-Code.de - Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

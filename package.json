@@ -1,0 +1,25 @@
+{
+  "name": "qrcode-de",
+  "version": "1.0.0",
+  "description": "QR-Code.de - Kostenloser QR-Code Generator",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": [
+    "qr-code",
+    "generator",
+    "qrcode",
+    "barcode",
+    "deutsch",
+    "german"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
