@@ -1,7 +1,25 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Logo } from './Logo'
 
 export function Footer() {
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
+
+  const scrollToSection = (sectionId: string) => {
+    if (!isHomePage) {
+      window.location.href = `/#${sectionId}`
+      return
+    }
+
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <footer className="bg-slate-900 text-white py-16">
       <div className="container mx-auto px-6">
@@ -21,15 +39,24 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Links</h4>
             <div className="flex flex-col gap-3">
-              <Link href="/#generator" className="text-slate-400 hover:text-white transition-colors">
+              <button
+                onClick={() => scrollToSection('generator')}
+                className="text-left text-slate-400 hover:text-white transition-colors"
+              >
                 Generator
-              </Link>
-              <Link href="/#features" className="text-slate-400 hover:text-white transition-colors">
+              </button>
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-left text-slate-400 hover:text-white transition-colors"
+              >
                 Funktionen
-              </Link>
-              <Link href="/#faq" className="text-slate-400 hover:text-white transition-colors">
+              </button>
+              <button
+                onClick={() => scrollToSection('faq')}
+                className="text-left text-slate-400 hover:text-white transition-colors"
+              >
                 FAQ
-              </Link>
+              </button>
             </div>
           </div>
 

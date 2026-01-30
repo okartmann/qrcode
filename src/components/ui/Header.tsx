@@ -1,12 +1,29 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Logo } from './Logo'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
+
+  const scrollToSection = (sectionId: string) => {
+    setMobileMenuOpen(false)
+
+    if (!isHomePage) {
+      window.location.href = `/#${sectionId}`
+      return
+    }
+
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -16,24 +33,24 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/#generator"
+            <button
+              onClick={() => scrollToSection('generator')}
               className="text-slate-600 hover:text-primary font-medium transition-colors"
             >
               Generator
-            </Link>
-            <Link
-              href="/#features"
+            </button>
+            <button
+              onClick={() => scrollToSection('features')}
               className="text-slate-600 hover:text-primary font-medium transition-colors"
             >
               Funktionen
-            </Link>
-            <Link
-              href="/#faq"
+            </button>
+            <button
+              onClick={() => scrollToSection('faq')}
               className="text-slate-600 hover:text-primary font-medium transition-colors"
             >
               FAQ
-            </Link>
+            </button>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -54,27 +71,24 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-slate-200">
             <div className="flex flex-col gap-4">
-              <Link
-                href="/#generator"
-                className="text-slate-600 hover:text-primary font-medium"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={() => scrollToSection('generator')}
+                className="text-left text-slate-600 hover:text-primary font-medium"
               >
                 Generator
-              </Link>
-              <Link
-                href="/#features"
-                className="text-slate-600 hover:text-primary font-medium"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={() => scrollToSection('features')}
+                className="text-left text-slate-600 hover:text-primary font-medium"
               >
                 Funktionen
-              </Link>
-              <Link
-                href="/#faq"
-                className="text-slate-600 hover:text-primary font-medium"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={() => scrollToSection('faq')}
+                className="text-left text-slate-600 hover:text-primary font-medium"
               >
                 FAQ
-              </Link>
+              </button>
             </div>
           </nav>
         )}
