@@ -5,28 +5,36 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline'
 
 const faqs = [
   {
-    question: 'Was ist ein QR-Code?',
-    answer: 'Ein QR-Code (Quick Response Code) ist ein zweidimensionaler Barcode, der Informationen speichert und von Smartphones und anderen Geräten gescannt werden kann. QR-Codes können URLs, Text, Kontaktdaten und vieles mehr enthalten.',
+    question: 'Ist der QR-Code Generator wirklich kostenlos?',
+    answer: 'Ja, absolut! qrcode.de ist zu 100% kostenlos. Es gibt keine versteckten Kosten, keine Premium-Funktionen, keine Abonnements und keine Wasserzeichen. Sie können unbegrenzt viele QR-Codes erstellen.',
   },
   {
-    question: 'Sind die QR-Codes wirklich kostenlos?',
-    answer: 'Ja! Alle QR-Codes, die Sie auf QR-Code.de erstellen, sind zu 100% kostenlos. Es gibt keine versteckten Kosten, keine Limits und keine Wasserzeichen.',
+    question: 'Was ist ein QR-Code?',
+    answer: 'Ein QR-Code (Quick Response Code) ist ein zweidimensionaler Barcode, der Informationen speichert und von Smartphones gescannt werden kann. QR-Codes können URLs, Text, WiFi-Zugangsdaten, Kontaktdaten (vCard) und vieles mehr enthalten.',
+  },
+  {
+    question: 'Muss ich mich registrieren?',
+    answer: 'Nein, Sie können sofort loslegen. qrcode.de erfordert keine Anmeldung, keine Registrierung und keine E-Mail-Adresse. Einfach QR-Code erstellen und herunterladen.',
   },
   {
     question: 'Kann ich die QR-Codes kommerziell nutzen?',
-    answer: 'Ja, Sie können alle erstellten QR-Codes uneingeschränkt für private und kommerzielle Zwecke verwenden.',
+    answer: 'Ja, Sie können alle erstellten QR-Codes uneingeschränkt für private und kommerzielle Zwecke verwenden. Keine Lizenzgebühren, keine Einschränkungen.',
   },
   {
     question: 'Welches Format sollte ich wählen - PNG oder SVG?',
-    answer: 'PNG eignet sich für die meisten Anwendungen wie Websites und Dokumente. SVG ist ideal für den Druck, da es ohne Qualitätsverlust skaliert werden kann.',
+    answer: 'PNG eignet sich für Websites, E-Mails und digitale Dokumente. SVG ist ideal für den Druck (Flyer, Visitenkarten, Plakate), da es ohne Qualitätsverlust beliebig skaliert werden kann.',
   },
   {
     question: 'Wie groß sollte mein QR-Code sein?',
-    answer: 'Die Mindestgröße hängt vom Scanabstand ab. Als Faustregel gilt: Der QR-Code sollte mindestens 2 cm × 2 cm groß sein. Für größere Abstände entsprechend größer.',
+    answer: 'Als Faustregel gilt: Der QR-Code sollte mindestens 2 cm × 2 cm groß sein. Für Plakate oder größere Scanabstände entsprechend größer. Testen Sie den QR-Code vor dem Druck mit Ihrem Smartphone.',
   },
   {
     question: 'Werden meine Daten gespeichert?',
-    answer: 'Nein. Alle QR-Codes werden direkt in Ihrem Browser generiert. Ihre Daten verlassen niemals Ihr Gerät und werden nicht auf unseren Servern gespeichert.',
+    answer: 'Nein. Alle QR-Codes werden direkt in Ihrem Browser generiert. Ihre eingegebenen Daten (URLs, Texte, Kontakte) verlassen niemals Ihr Gerät und werden nicht auf unseren Servern gespeichert.',
+  },
+  {
+    question: 'Gibt es eine Begrenzung für die Anzahl der QR-Codes?',
+    answer: 'Nein, Sie können unbegrenzt viele QR-Codes erstellen. Es gibt keine täglichen, monatlichen oder sonstigen Limits bei qrcode.de.',
   },
 ]
 

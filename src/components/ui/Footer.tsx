@@ -12,8 +12,8 @@ export function Footer() {
               <Logo />
             </div>
             <p className="text-slate-400 max-w-md">
-              Kostenloser QR-Code Generator für alle Ihre Bedürfnisse.
-              Erstellen Sie professionelle QR-Codes in Sekunden.
+              Der kostenlose QR-Code Generator ohne versteckte Kosten.
+              Erstellen Sie professionelle QR-Codes in Sekunden - ohne Anmeldung.
             </p>
           </div>
 
@@ -48,7 +48,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-800 text-center text-slate-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} QR-Code.de - Alle Rechte vorbehalten.</p>
+          <p>&copy; {new Date().getFullYear()} qrcode.de - Kostenloser QR-Code Generator</p>
         </div>
       </div>
     </footer>

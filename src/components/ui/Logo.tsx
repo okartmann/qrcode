@@ -70,10 +70,10 @@ export function Logo({ className = '', showText = true }: LogoProps) {
       {showText && (
         <div className="flex flex-col">
           <span className="text-xl font-bold text-slate-900 leading-tight">
-            QR-Code<span className="text-primary">.de</span>
+            qrcode<span className="text-primary">.de</span>
           </span>
           <span className="text-xs text-slate-500 font-medium -mt-0.5">
-            Generator
+            Kostenloser Generator
           </span>
         </div>
       )}

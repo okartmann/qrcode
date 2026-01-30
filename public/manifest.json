@@ -1,0 +1,16 @@
+{
+  "name": "qrcode.de - Kostenloser QR-Code Generator",
+  "short_name": "qrcode.de",
+  "description": "Erstellen Sie kostenlos QR-Codes ohne versteckte Kosten. Generator für URLs, Text, WiFi, vCard und mehr.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Impressum - QR-Code.de',
-  description: 'Impressum und Kontaktinformationen von QR-Code.de',
+  title: 'Impressum',
+  description: 'Impressum und Kontaktinformationen von qrcode.de - Kostenloser QR-Code Generator',
 }
 
 export default function ImpressumPage() {

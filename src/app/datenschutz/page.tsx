@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Datenschutz - QR-Code.de',
-  description: 'Datenschutzerklärung von QR-Code.de',
+  title: 'Datenschutz',
+  description: 'Datenschutzerklärung von qrcode.de - Kostenloser QR-Code Generator. Wir speichern keine personenbezogenen Daten.',
 }
 
 export default function DatenschutzPage() {
