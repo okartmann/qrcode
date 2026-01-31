@@ -16,7 +16,7 @@ import { PayPalForm } from './forms/PayPalForm'
 import { BitcoinForm } from './forms/BitcoinForm'
 import { QRPreview } from './QRPreview'
 import { QRCustomization } from './QRCustomization'
-import { EyeIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import type {
   QRCodeType,
   QROptions,
@@ -48,7 +48,6 @@ import {
 export function QRGenerator() {
   const [activeType, setActiveType] = useState<QRCodeType>('url')
   const [qrData, setQrData] = useState<string | null>(null)
-  const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [options, setOptions] = useState<QROptions>({
     size: 300,
     color: '#000000',
@@ -181,10 +180,6 @@ export function QRGenerator() {
     }
 
     setQrData(data)
-    // Show preview on mobile after generating
-    if (data && window.innerWidth < 1024) {
-      setShowMobilePreview(true)
-    }
   }, [activeType, urlValue, textValue, wifiData, vcardData, emailData, phoneValue, smsData, whatsappData, locationData, eventData, paypalData, bitcoinData])
 
   const handleTypeChange = (type: QRCodeType) => {
@@ -194,7 +189,27 @@ export function QRGenerator() {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+      {/* Mobile Sticky Preview Bar - Always visible at top */}
+      <div className="lg:hidden sticky top-16 z-30 -mx-4 px-4 py-3 bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <QRPreview data={qrData} options={options} type={activeType} compact />
+          {qrData && (
+            <button
+              onClick={() => {
+                // Scroll to download section or trigger download
+                const preview = document.getElementById('full-preview')
+                if (preview) preview.scrollIntoView({ behavior: 'smooth' })
+              }}
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              Download
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start mt-4 lg:mt-0">
         {/* Left Column - Options */}
         <div className="card">
           <h2 className="text-2xl font-bold mb-6">QR-Code erstellen</h2>
@@ -251,68 +266,13 @@ export function QRGenerator() {
         </div>
 
         {/* Right Column - Preview (Desktop) */}
-        <div className="hidden lg:block lg:sticky lg:top-24">
-          <QRPreview data={qrData} options={options} type={activeType} />
-        </div>
-      </div>
-
-      {/* Mobile Preview Button - Fixed at bottom */}
-      <div className="fixed bottom-4 right-4 lg:hidden z-40">
-        <button
-          onClick={() => setShowMobilePreview(true)}
-          className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-colors"
-        >
-          <EyeIcon className="w-5 h-5" />
-          <span className="font-medium">Vorschau</span>
-          {qrData && (
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Preview Modal */}
-      {showMobilePreview && (
-        <div className="fixed inset-0 bg-black/50 z-50 lg:hidden flex items-end">
-          <div
-            className="absolute inset-0"
-            onClick={() => setShowMobilePreview(false)}
-          />
-          <div className="relative w-full bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto animate-slideUp">
-            {/* Handle bar */}
-            <div className="sticky top-0 bg-white pt-3 pb-2 border-b border-slate-100 z-10">
-              <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-2" />
-              <div className="flex items-center justify-between px-4">
-                <h3 className="font-semibold text-slate-800">QR-Code Vorschau</h3>
-                <button
-                  onClick={() => setShowMobilePreview(false)}
-                  className="p-2 text-slate-500 hover:text-slate-700 rounded-lg hover:bg-slate-100"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4">
-              <QRPreview data={qrData} options={options} type={activeType} />
-            </div>
+        <div id="full-preview" className="lg:sticky lg:top-24">
+          {/* Show full preview on mobile too, below the form */}
+          <div className="lg:block">
+            <QRPreview data={qrData} options={options} type={activeType} />
           </div>
         </div>
-      )}
-
-      {/* Add animation styles */}
-      <style jsx global>{`
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        .animate-slideUp {
-          animation: slideUp 0.3s ease-out;
-        }
-      `}</style>
+      </div>
     </>
   )
 }

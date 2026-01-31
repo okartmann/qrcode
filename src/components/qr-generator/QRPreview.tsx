@@ -9,12 +9,13 @@ interface QRPreviewProps {
   data: string | null
   options: QROptions
   type: QRCodeType
+  compact?: boolean  // For mobile sticky preview
 }
 
 // Placeholder URL for preview when no data is entered
 const PLACEHOLDER_DATA = 'https://qrcode.de'
 
-export function QRPreview({ data, options, type }: QRPreviewProps) {
+export function QRPreview({ data, options, type, compact = false }: QRPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,7 +23,7 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
   const displayData = data || PLACEHOLDER_DATA
   const isPreview = !data
 
-  const drawLogo = useCallback((canvas: HTMLCanvasElement, logoSrc: string) => {
+  const drawLogo = useCallback((canvas: HTMLCanvasElement, logoSrc: string, scaleFactor: number = 1) => {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -30,24 +31,19 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       const canvasSize = canvas.width
-      const logoSize = options.logoSize
-      const padding = options.logoPadding
+      const logoSize = options.logoSize * scaleFactor
+      const padding = options.logoPadding * scaleFactor
       const totalSize = logoSize + padding * 2
 
-      // Calculate center position
       const x = (canvasSize - totalSize) / 2
       const y = (canvasSize - totalSize) / 2
 
-      // Draw white background for logo
       ctx.fillStyle = options.logoBackgroundColor
       ctx.beginPath()
-      ctx.roundRect(x, y, totalSize, totalSize, 8)
+      ctx.roundRect(x, y, totalSize, totalSize, 8 * scaleFactor)
       ctx.fill()
 
-      // Draw logo
-      const logoX = x + padding
-      const logoY = y + padding
-      ctx.drawImage(img, logoX, logoY, logoSize, logoSize)
+      ctx.drawImage(img, x + padding, y + padding, logoSize, logoSize)
     }
     img.src = logoSrc
   }, [options.logoSize, options.logoPadding, options.logoBackgroundColor])
@@ -58,17 +54,16 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
       return
     }
 
-    // Use higher error correction when logo is present
     const errorLevel = options.logo ?
       (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
       options.errorCorrection
 
-    // Limit preview size to 300px for performance, actual download uses full size
-    const previewSize = Math.min(options.size, 300)
+    // Compact mode uses smaller size, normal preview limited to 300px
+    const previewSize = compact ? 80 : Math.min(options.size, 300)
 
     const qrOptions = {
       width: previewSize,
-      margin: 2,
+      margin: compact ? 1 : 2,
       color: {
         dark: options.color,
         light: options.bgColor,
@@ -79,43 +74,52 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
     QRCode.toCanvas(canvasRef.current, displayData, qrOptions, (err) => {
       if (err) {
         console.error(err)
-        setError('Fehler beim Generieren des QR-Codes.')
+        setError('Fehler')
       } else {
         setError(null)
-        // Draw logo if present
         if (options.logo && canvasRef.current) {
-          // Scale logo size for preview
           const scaleFactor = previewSize / options.size
-          const scaledLogoSize = options.logoSize * scaleFactor
-          const scaledPadding = options.logoPadding * scaleFactor
-
-          const ctx = canvasRef.current.getContext('2d')
-          if (ctx) {
-            const canvasSize = canvasRef.current.width
-            const totalSize = scaledLogoSize + scaledPadding * 2
-            const x = (canvasSize - totalSize) / 2
-            const y = (canvasSize - totalSize) / 2
-
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            img.onload = () => {
-              ctx.fillStyle = options.logoBackgroundColor
-              ctx.beginPath()
-              ctx.roundRect(x, y, totalSize, totalSize, 8 * scaleFactor)
-              ctx.fill()
-              ctx.drawImage(img, x + scaledPadding, y + scaledPadding, scaledLogoSize, scaledLogoSize)
-            }
-            img.src = options.logo
-          }
+          drawLogo(canvasRef.current, options.logo, scaleFactor)
         }
       }
     })
-  }, [displayData, options, drawLogo])
+  }, [displayData, options, compact, drawLogo])
 
+  // Compact mode for mobile sticky preview
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3">
+        <div className={`relative ${isPreview ? 'opacity-60' : ''}`}>
+          {error ? (
+            <div className="w-[80px] h-[80px] bg-slate-100 rounded flex items-center justify-center">
+              <span className="text-xs text-slate-400">Fehler</span>
+            </div>
+          ) : (
+            <canvas ref={canvasRef} className="rounded shadow-sm" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          {isPreview ? (
+            <p className="text-sm text-slate-500">
+              Live-Vorschau
+            </p>
+          ) : (
+            <p className="text-sm font-medium text-green-600">
+              QR-Code bereit!
+            </p>
+          )}
+          <p className="text-xs text-slate-400 truncate">
+            {options.size}×{options.size}px
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Full preview mode
   const downloadPNG = async () => {
     if (!data) return
 
-    // Create a new canvas for the full-size download
     const downloadCanvas = document.createElement('canvas')
     downloadCanvas.width = options.size
     downloadCanvas.height = options.size
@@ -137,7 +141,6 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
     try {
       await QRCode.toCanvas(downloadCanvas, data, qrOptions)
 
-      // Draw logo at full size if present
       if (options.logo) {
         const ctx = downloadCanvas.getContext('2d')
         if (ctx) {
@@ -194,7 +197,6 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
     try {
       let svg = await QRCode.toString(data, qrOptions)
 
-      // Embed logo in SVG if present
       if (options.logo) {
         const logoSize = options.logoSize
         const padding = options.logoPadding
@@ -202,7 +204,6 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
         const x = (options.size - totalSize) / 2
         const y = (options.size - totalSize) / 2
 
-        // Add logo elements before closing </svg>
         const logoElements = `
           <rect x="${x}" y="${y}" width="${totalSize}" height="${totalSize}" rx="8" fill="${options.logoBackgroundColor}"/>
           <image x="${x + padding}" y="${y + padding}" width="${logoSize}" height="${logoSize}" href="${options.logo}"/>
@@ -224,31 +225,20 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
 
   return (
     <div className="card text-center relative">
-      {/* Preview Badge */}
+      {/* Preview Badge - outside the QR code */}
       {isPreview && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-            <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="mb-3">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+            <svg className="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Vorschau
+            Live-Vorschau mit Beispieldaten
           </span>
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-slate-600 mb-4">
-        {isPreview ? 'Live-Vorschau' : 'Ihr QR-Code'}
-      </h3>
-
-      {/* Preview info text */}
-      {isPreview && (
-        <p className="text-xs text-slate-500 mb-4 -mt-2">
-          Geben Sie Daten ein, um Ihren QR-Code zu erstellen
-        </p>
-      )}
-
-      <div className={`bg-slate-50 rounded-lg p-4 min-h-[200px] flex items-center justify-center mb-4 ${isPreview ? 'border-2 border-dashed border-slate-300' : ''}`}>
+      <div className={`bg-slate-50 rounded-xl p-6 flex items-center justify-center mb-4 ${isPreview ? 'border-2 border-dashed border-slate-200' : 'border border-slate-200'}`}>
         {error ? (
           <div className="text-red-500 flex flex-col items-center gap-3">
             <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -259,28 +249,23 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
             <p>{error}</p>
           </div>
         ) : (
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              className={`max-w-full h-auto rounded-lg ${isPreview ? 'opacity-70' : ''}`}
-            />
-            {isPreview && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm border border-slate-200">
-                  <span className="text-xs font-medium text-slate-600">qrcode.de</span>
-                </div>
-              </div>
-            )}
-          </div>
+          <canvas
+            ref={canvasRef}
+            className={`max-w-full h-auto rounded-lg ${isPreview ? 'opacity-50' : ''}`}
+          />
         )}
       </div>
 
-      {/* Size indicator */}
+      {/* Info line */}
       <p className="text-xs text-slate-500 mb-4">
-        Download-Größe: <span className="font-medium">{options.size} × {options.size} Pixel</span>
+        {isPreview ? (
+          <>Geben Sie Ihre Daten ein um einen QR-Code zu erstellen</>
+        ) : (
+          <>Download-Größe: <span className="font-medium">{options.size} × {options.size} Pixel</span></>
+        )}
       </p>
 
-      {/* Download buttons - only show when data is present */}
+      {/* Download buttons */}
       {data && !error && (
         <div className="flex flex-col gap-3">
           <button onClick={downloadPNG} className="btn-success w-full">
@@ -296,14 +281,15 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
 
       {/* Call to action when in preview mode */}
       {isPreview && (
-        <div className="text-center">
-          <p className="text-sm text-slate-600">
-            Füllen Sie das Formular aus und klicken Sie auf
-          </p>
-          <p className="text-sm font-semibold text-primary mt-1">
-            &quot;QR-Code generieren&quot;
-          </p>
-        </div>
+        <button
+          onClick={() => {
+            const form = document.querySelector('input, textarea')
+            if (form instanceof HTMLElement) form.focus()
+          }}
+          className="btn-primary w-full"
+        >
+          Jetzt QR-Code erstellen
+        </button>
       )}
     </div>
   )
