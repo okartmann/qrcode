@@ -15,14 +15,14 @@ export type QRCodeType =
   | 'social'
 
 // Design Options - Dot/Module Styles
+// Note: Only styles supported by qr-code-styling library
 export type DotStyle =
   | 'square'
   | 'rounded'
   | 'dots'
   | 'classy'
   | 'classy-rounded'
-  | 'diamond'
-  | 'star'
+  | 'extra-rounded'
 
 // Corner/Eye Frame Styles (outer square of the 3 corner markers)
 export type CornerFrameStyle =

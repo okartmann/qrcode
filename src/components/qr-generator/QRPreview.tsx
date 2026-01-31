@@ -22,8 +22,7 @@ const mapDotStyle = (style: DotStyle): string => {
     'dots': 'dots',
     'classy': 'classy',
     'classy-rounded': 'classy-rounded',
-    'diamond': 'square', // fallback
-    'star': 'square', // fallback
+    'extra-rounded': 'extra-rounded',
   }
   return mapping[style] || 'square'
 }
@@ -55,9 +54,13 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
   const qrCodeRef = useRef<InstanceType<typeof import('qr-code-styling').default> | null>(null)
   const [isClient, setIsClient] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const renderIdRef = useRef(0)
 
   const displayData = data || PLACEHOLDER_DATA
   const isPreview = !data
+
+  // Create a unique key based on QR-relevant options (not frame options)
+  const qrKey = `${displayData}-${options.color}-${options.bgColor}-${options.dotStyle}-${options.cornerFrameStyle}-${options.cornerDotStyle}-${options.cornerColor}-${options.cornerDotColor}-${options.logo || 'nologo'}-${options.errorCorrection}-${compact}`
 
   // Initialize on client side only
   useEffect(() => {
@@ -68,9 +71,22 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
   useEffect(() => {
     if (!isClient || !containerRef.current) return
 
+    // Increment render ID to track this specific render
+    renderIdRef.current += 1
+    const currentRenderId = renderIdRef.current
+
+    // Store ref to current container for cleanup
+    const currentContainer = containerRef.current
+
+    // Clear container immediately
+    currentContainer.innerHTML = ''
+
     const initQR = async () => {
       try {
         const QRCodeStyling = (await import('qr-code-styling')).default
+
+        // Don't proceed if a newer render has started
+        if (currentRenderId !== renderIdRef.current) return
 
         const size = compact ? 80 : Math.min(options.size, 300)
 
@@ -113,27 +129,36 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
           }
         }
 
-        // Clear container
-        if (containerRef.current) {
-          containerRef.current.innerHTML = ''
-        }
+        // Check again before appending
+        if (currentRenderId !== renderIdRef.current) return
 
         // Create new QR code
         const qrCode = new QRCodeStyling(qrOptions)
         qrCodeRef.current = qrCode
 
-        if (containerRef.current) {
-          qrCode.append(containerRef.current)
+        // Final check and clear before append
+        if (currentRenderId === renderIdRef.current && currentContainer) {
+          currentContainer.innerHTML = ''
+          qrCode.append(currentContainer)
         }
 
         setError(null)
       } catch (err) {
         console.error('QR Code generation error:', err)
-        setError('Fehler beim Generieren')
+        if (currentRenderId === renderIdRef.current) {
+          setError('Fehler beim Generieren')
+        }
       }
     }
 
     initQR()
+
+    // Cleanup function
+    return () => {
+      if (currentContainer) {
+        currentContainer.innerHTML = ''
+      }
+    }
   }, [isClient, displayData, options, compact])
 
   // Download handlers
@@ -355,7 +380,7 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         ) : !isClient ? (
           <div className="w-[300px] h-[300px] bg-slate-100 rounded-lg animate-pulse" />
         ) : (
-          <div ref={frameContainerRef}>
+          <div ref={frameContainerRef} key={options.frameStyle}>
             <QRCodeFrame
               frameStyle={options.frameStyle}
               frameColor={options.frameColor}
@@ -364,6 +389,7 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
               bgColor={options.bgColor}
             >
               <div
+                key={qrKey}
                 ref={containerRef}
                 className={`[&>canvas]:rounded-lg [&>svg]:rounded-lg ${isPreview ? 'opacity-50' : ''}`}
               />

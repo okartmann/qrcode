@@ -92,8 +92,7 @@ export function QRCustomization({ options, onChange }: QRCustomizationProps) {
     { id: 'dots', name: 'Punkte', preview: '●' },
     { id: 'classy', name: 'Klassisch', preview: '◆' },
     { id: 'classy-rounded', name: 'Klassisch Rund', preview: '◇' },
-    { id: 'diamond', name: 'Diamant', preview: '◈' },
-    { id: 'star', name: 'Stern', preview: '★' },
+    { id: 'extra-rounded', name: 'Extra Rund', preview: '○' },
   ]
 
   const cornerFrameStyles: { id: CornerFrameStyle; name: string }[] = [
