@@ -52,8 +52,10 @@ export function QRGenerator() {
     color: '#000000',
     bgColor: '#ffffff',
     dotStyle: 'square',
-    cornerStyle: 'square',
+    cornerFrameStyle: 'square',
+    cornerDotStyle: 'square',
     cornerColor: '#000000',
+    cornerDotColor: '#000000',
     gradientEnabled: false,
     gradientColor: '#000000',
     gradientType: 'linear',
@@ -63,7 +65,7 @@ export function QRGenerator() {
     logoBackgroundColor: '#ffffff',
     frameStyle: 'none',
     frameColor: '#000000',
-    frameText: 'Jetzt scannen',
+    frameText: 'Jetzt scannen!',
     errorCorrection: 'M',
   })
 
