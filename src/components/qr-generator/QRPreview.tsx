@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import QRCode from 'qrcode'
 import type { QROptions, QRCodeType } from '@/types/qr'
 import { ArrowDownTrayIcon, QrCodeIcon } from '@heroicons/react/24/outline'
@@ -15,11 +15,46 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const drawLogo = useCallback((canvas: HTMLCanvasElement, logoSrc: string) => {
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvasSize = canvas.width
+      const logoSize = options.logoSize
+      const padding = options.logoPadding
+      const totalSize = logoSize + padding * 2
+
+      // Calculate center position
+      const x = (canvasSize - totalSize) / 2
+      const y = (canvasSize - totalSize) / 2
+
+      // Draw white background for logo
+      ctx.fillStyle = options.logoBackgroundColor
+      ctx.beginPath()
+      ctx.roundRect(x, y, totalSize, totalSize, 8)
+      ctx.fill()
+
+      // Draw logo
+      const logoX = x + padding
+      const logoY = y + padding
+      ctx.drawImage(img, logoX, logoY, logoSize, logoSize)
+    }
+    img.src = logoSrc
+  }, [options.logoSize, options.logoPadding, options.logoBackgroundColor])
+
   useEffect(() => {
     if (!data || !canvasRef.current) {
       setError(null)
       return
     }
+
+    // Use higher error correction when logo is present
+    const errorLevel = options.logo ?
+      (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
+      options.errorCorrection
 
     const qrOptions = {
       width: options.size,
@@ -28,7 +63,7 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
         dark: options.color,
         light: options.bgColor,
       },
-      errorCorrectionLevel: 'M' as const,
+      errorCorrectionLevel: errorLevel,
     }
 
     QRCode.toCanvas(canvasRef.current, data, qrOptions, (err) => {
@@ -37,9 +72,13 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
         setError('Fehler beim Generieren des QR-Codes.')
       } else {
         setError(null)
+        // Draw logo if present
+        if (options.logo && canvasRef.current) {
+          drawLogo(canvasRef.current, options.logo)
+        }
       }
     })
-  }, [data, options])
+  }, [data, options, drawLogo])
 
   const downloadPNG = () => {
     if (!canvasRef.current) return
@@ -53,6 +92,10 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
   const downloadSVG = async () => {
     if (!data) return
 
+    const errorLevel = options.logo ?
+      (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
+      options.errorCorrection
+
     const qrOptions = {
       width: options.size,
       margin: 2,
@@ -60,12 +103,29 @@ export function QRPreview({ data, options, type }: QRPreviewProps) {
         dark: options.color,
         light: options.bgColor,
       },
-      errorCorrectionLevel: 'M' as const,
+      errorCorrectionLevel: errorLevel,
       type: 'svg' as const,
     }
 
     try {
-      const svg = await QRCode.toString(data, qrOptions)
+      let svg = await QRCode.toString(data, qrOptions)
+
+      // Embed logo in SVG if present
+      if (options.logo) {
+        const logoSize = options.logoSize
+        const padding = options.logoPadding
+        const totalSize = logoSize + padding * 2
+        const x = (options.size - totalSize) / 2
+        const y = (options.size - totalSize) / 2
+
+        // Add logo elements before closing </svg>
+        const logoElements = `
+          <rect x="${x}" y="${y}" width="${totalSize}" height="${totalSize}" rx="8" fill="${options.logoBackgroundColor}"/>
+          <image x="${x + padding}" y="${y + padding}" width="${logoSize}" height="${logoSize}" href="${options.logo}"/>
+        `
+        svg = svg.replace('</svg>', logoElements + '</svg>')
+      }
+
       const blob = new Blob([svg], { type: 'image/svg+xml' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')

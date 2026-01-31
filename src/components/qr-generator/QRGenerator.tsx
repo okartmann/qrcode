@@ -8,9 +8,27 @@ import { WiFiForm } from './forms/WiFiForm'
 import { VCardForm } from './forms/VCardForm'
 import { EmailForm } from './forms/EmailForm'
 import { PhoneForm } from './forms/PhoneForm'
+import { SMSForm } from './forms/SMSForm'
+import { WhatsAppForm } from './forms/WhatsAppForm'
+import { LocationForm } from './forms/LocationForm'
+import { EventForm } from './forms/EventForm'
+import { PayPalForm } from './forms/PayPalForm'
+import { BitcoinForm } from './forms/BitcoinForm'
 import { QRPreview } from './QRPreview'
 import { QRCustomization } from './QRCustomization'
-import type { QRCodeType, QROptions, WiFiData, VCardData, EmailData } from '@/types/qr'
+import type {
+  QRCodeType,
+  QROptions,
+  WiFiData,
+  VCardData,
+  EmailData,
+  SMSData,
+  WhatsAppData,
+  LocationData,
+  EventData,
+  PayPalData,
+  BitcoinData,
+} from '@/types/qr'
 import {
   generateURLData,
   generateTextData,
@@ -18,15 +36,35 @@ import {
   generateVCardData,
   generateEmailData,
   generatePhoneData,
+  generateSMSData,
+  generateWhatsAppData,
+  generateLocationData,
+  generateEventData,
+  generatePayPalData,
+  generateBitcoinData,
 } from '@/lib/qr-utils'
 
 export function QRGenerator() {
   const [activeType, setActiveType] = useState<QRCodeType>('url')
   const [qrData, setQrData] = useState<string | null>(null)
   const [options, setOptions] = useState<QROptions>({
-    size: 256,
+    size: 300,
     color: '#000000',
     bgColor: '#ffffff',
+    dotStyle: 'square',
+    cornerStyle: 'square',
+    cornerColor: '#000000',
+    gradientEnabled: false,
+    gradientColor: '#000000',
+    gradientType: 'linear',
+    logo: null,
+    logoSize: 60,
+    logoPadding: 5,
+    logoBackgroundColor: '#ffffff',
+    frameStyle: 'none',
+    frameColor: '#000000',
+    frameText: 'Jetzt scannen',
+    errorCorrection: 'M',
   })
 
   // Form states
@@ -36,13 +74,23 @@ export function QRGenerator() {
     ssid: '',
     password: '',
     encryption: 'WPA',
+    hidden: false,
   })
   const [vcardData, setVcardData] = useState<VCardData>({
     name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
+    mobile: '',
     email: '',
     company: '',
+    jobTitle: '',
     website: '',
+    address: '',
+    city: '',
+    zip: '',
+    country: '',
+    note: '',
   })
   const [emailData, setEmailData] = useState<EmailData>({
     address: '',
@@ -50,6 +98,41 @@ export function QRGenerator() {
     body: '',
   })
   const [phoneValue, setPhoneValue] = useState('')
+  const [smsData, setSmsData] = useState<SMSData>({
+    phone: '',
+    message: '',
+  })
+  const [whatsappData, setWhatsappData] = useState<WhatsAppData>({
+    phone: '',
+    message: '',
+  })
+  const [locationData, setLocationData] = useState<LocationData>({
+    latitude: '',
+    longitude: '',
+    query: '',
+  })
+  const [eventData, setEventData] = useState<EventData>({
+    title: '',
+    location: '',
+    startDate: '',
+    startTime: '',
+    endDate: '',
+    endTime: '',
+    description: '',
+    allDay: false,
+  })
+  const [paypalData, setPaypalData] = useState<PayPalData>({
+    email: '',
+    itemName: '',
+    price: '',
+    currency: 'EUR',
+  })
+  const [bitcoinData, setBitcoinData] = useState<BitcoinData>({
+    address: '',
+    amount: '',
+    label: '',
+    message: '',
+  })
 
   const generateQRCode = useCallback(() => {
     let data: string | null = null
@@ -73,10 +156,28 @@ export function QRGenerator() {
       case 'phone':
         data = generatePhoneData(phoneValue)
         break
+      case 'sms':
+        data = generateSMSData(smsData)
+        break
+      case 'whatsapp':
+        data = generateWhatsAppData(whatsappData)
+        break
+      case 'location':
+        data = generateLocationData(locationData)
+        break
+      case 'event':
+        data = generateEventData(eventData)
+        break
+      case 'paypal':
+        data = generatePayPalData(paypalData)
+        break
+      case 'bitcoin':
+        data = generateBitcoinData(bitcoinData)
+        break
     }
 
     setQrData(data)
-  }, [activeType, urlValue, textValue, wifiData, vcardData, emailData, phoneValue])
+  }, [activeType, urlValue, textValue, wifiData, vcardData, emailData, phoneValue, smsData, whatsappData, locationData, eventData, paypalData, bitcoinData])
 
   const handleTypeChange = (type: QRCodeType) => {
     setActiveType(type)
@@ -84,7 +185,7 @@ export function QRGenerator() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
       {/* Left Column - Options */}
       <div className="card">
         <h2 className="text-2xl font-bold mb-6">QR-Code erstellen</h2>
@@ -109,6 +210,24 @@ export function QRGenerator() {
           )}
           {activeType === 'phone' && (
             <PhoneForm value={phoneValue} onChange={setPhoneValue} />
+          )}
+          {activeType === 'sms' && (
+            <SMSForm data={smsData} onChange={setSmsData} />
+          )}
+          {activeType === 'whatsapp' && (
+            <WhatsAppForm data={whatsappData} onChange={setWhatsappData} />
+          )}
+          {activeType === 'location' && (
+            <LocationForm data={locationData} onChange={setLocationData} />
+          )}
+          {activeType === 'event' && (
+            <EventForm data={eventData} onChange={setEventData} />
+          )}
+          {activeType === 'paypal' && (
+            <PayPalForm data={paypalData} onChange={setPaypalData} />
+          )}
+          {activeType === 'bitcoin' && (
+            <BitcoinForm data={bitcoinData} onChange={setBitcoinData} />
           )}
         </div>
 

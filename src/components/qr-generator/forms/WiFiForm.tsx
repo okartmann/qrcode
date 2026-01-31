@@ -35,6 +35,7 @@ export function WiFiForm({ data, onChange }: WiFiFormProps) {
           onChange={(e) => onChange({ ...data, password: e.target.value })}
           placeholder="Passwort eingeben"
           className="input-field"
+          disabled={data.encryption === 'nopass'}
         />
       </div>
 
@@ -48,10 +49,23 @@ export function WiFiForm({ data, onChange }: WiFiFormProps) {
           onChange={(e) => onChange({ ...data, encryption: e.target.value as WiFiData['encryption'] })}
           className="input-field cursor-pointer"
         >
-          <option value="WPA">WPA/WPA2</option>
+          <option value="WPA">WPA/WPA2/WPA3</option>
           <option value="WEP">WEP</option>
-          <option value="nopass">Keine</option>
+          <option value="nopass">Keine (offen)</option>
         </select>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="wifi-hidden"
+          checked={data.hidden}
+          onChange={(e) => onChange({ ...data, hidden: e.target.checked })}
+          className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary"
+        />
+        <label htmlFor="wifi-hidden" className="text-sm text-slate-700">
+          Verstecktes Netzwerk
+        </label>
       </div>
     </div>
   )
