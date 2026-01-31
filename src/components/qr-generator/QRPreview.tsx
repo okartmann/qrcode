@@ -1,89 +1,246 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
-import QRCode from 'qrcode'
-import type { QROptions, QRCodeType } from '@/types/qr'
+import { useEffect, useRef, useState } from 'react'
+import type { QROptions, QRCodeType, DotStyle, CornerFrameStyle, CornerDotStyle } from '@/types/qr'
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 
 interface QRPreviewProps {
   data: string | null
   options: QROptions
   type: QRCodeType
-  compact?: boolean  // For mobile sticky preview
+  compact?: boolean
 }
 
-// Placeholder URL for preview when no data is entered
 const PLACEHOLDER_DATA = 'https://qrcode.de'
 
+// Map our dot styles to qr-code-styling types
+const mapDotStyle = (style: DotStyle): string => {
+  const mapping: Record<DotStyle, string> = {
+    'square': 'square',
+    'rounded': 'rounded',
+    'dots': 'dots',
+    'classy': 'classy',
+    'classy-rounded': 'classy-rounded',
+    'diamond': 'square', // fallback
+    'star': 'square', // fallback
+  }
+  return mapping[style] || 'square'
+}
+
+// Map corner frame styles
+const mapCornerFrameStyle = (style: CornerFrameStyle): string => {
+  const mapping: Record<CornerFrameStyle, string> = {
+    'square': 'square',
+    'rounded': 'extra-rounded',
+    'circle': 'dot',
+    'rounded-sm': 'extra-rounded',
+  }
+  return mapping[style] || 'square'
+}
+
+// Map corner dot styles
+const mapCornerDotStyle = (style: CornerDotStyle): string => {
+  const mapping: Record<CornerDotStyle, string> = {
+    'square': 'square',
+    'dot': 'dot',
+    'rounded': 'dot',
+  }
+  return mapping[style] || 'square'
+}
+
 export function QRPreview({ data, options, type, compact = false }: QRPreviewProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const qrCodeRef = useRef<InstanceType<typeof import('qr-code-styling').default> | null>(null)
+  const [isClient, setIsClient] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Use actual data or placeholder for preview
   const displayData = data || PLACEHOLDER_DATA
   const isPreview = !data
 
-  const drawLogo = useCallback((canvas: HTMLCanvasElement, logoSrc: string, scaleFactor: number = 1) => {
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvasSize = canvas.width
-      const logoSize = options.logoSize * scaleFactor
-      const padding = options.logoPadding * scaleFactor
-      const totalSize = logoSize + padding * 2
-
-      const x = (canvasSize - totalSize) / 2
-      const y = (canvasSize - totalSize) / 2
-
-      ctx.fillStyle = options.logoBackgroundColor
-      ctx.beginPath()
-      ctx.roundRect(x, y, totalSize, totalSize, 8 * scaleFactor)
-      ctx.fill()
-
-      ctx.drawImage(img, x + padding, y + padding, logoSize, logoSize)
-    }
-    img.src = logoSrc
-  }, [options.logoSize, options.logoPadding, options.logoBackgroundColor])
-
+  // Initialize on client side only
   useEffect(() => {
-    if (!canvasRef.current) {
-      setError(null)
-      return
-    }
+    setIsClient(true)
+  }, [])
 
-    const errorLevel = options.logo ?
-      (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
-      options.errorCorrection
+  // Create and update QR code
+  useEffect(() => {
+    if (!isClient || !containerRef.current) return
 
-    // Compact mode uses smaller size, normal preview limited to 300px
-    const previewSize = compact ? 80 : Math.min(options.size, 300)
+    const initQR = async () => {
+      try {
+        const QRCodeStyling = (await import('qr-code-styling')).default
 
-    const qrOptions = {
-      width: previewSize,
-      margin: compact ? 1 : 2,
-      color: {
-        dark: options.color,
-        light: options.bgColor,
-      },
-      errorCorrectionLevel: errorLevel,
-    }
+        const size = compact ? 80 : Math.min(options.size, 300)
 
-    QRCode.toCanvas(canvasRef.current, displayData, qrOptions, (err) => {
-      if (err) {
-        console.error(err)
-        setError('Fehler')
-      } else {
+        const qrOptions: ConstructorParameters<typeof QRCodeStyling>[0] = {
+          width: size,
+          height: size,
+          data: displayData,
+          margin: compact ? 2 : 8,
+          dotsOptions: {
+            color: options.color,
+            type: mapDotStyle(options.dotStyle) as 'square' | 'rounded' | 'dots' | 'classy' | 'classy-rounded' | 'extra-rounded',
+          },
+          cornersSquareOptions: {
+            color: options.cornerColor,
+            type: mapCornerFrameStyle(options.cornerFrameStyle) as 'square' | 'extra-rounded' | 'dot',
+          },
+          cornersDotOptions: {
+            color: options.cornerDotColor,
+            type: mapCornerDotStyle(options.cornerDotStyle) as 'square' | 'dot',
+          },
+          backgroundOptions: {
+            color: options.bgColor,
+          },
+          qrOptions: {
+            errorCorrectionLevel: options.logo ?
+              (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
+              options.errorCorrection,
+          },
+        }
+
+        // Add logo if present
+        if (options.logo) {
+          const scaleFactor = size / options.size
+          qrOptions.image = options.logo
+          qrOptions.imageOptions = {
+            crossOrigin: 'anonymous',
+            margin: Math.round(options.logoPadding * scaleFactor),
+            imageSize: 0.4,
+            hideBackgroundDots: true,
+          }
+        }
+
+        // Clear container
+        if (containerRef.current) {
+          containerRef.current.innerHTML = ''
+        }
+
+        // Create new QR code
+        const qrCode = new QRCodeStyling(qrOptions)
+        qrCodeRef.current = qrCode
+
+        if (containerRef.current) {
+          qrCode.append(containerRef.current)
+        }
+
         setError(null)
-        if (options.logo && canvasRef.current) {
-          const scaleFactor = previewSize / options.size
-          drawLogo(canvasRef.current, options.logo, scaleFactor)
+      } catch (err) {
+        console.error('QR Code generation error:', err)
+        setError('Fehler beim Generieren')
+      }
+    }
+
+    initQR()
+  }, [isClient, displayData, options, compact])
+
+  // Download handlers
+  const downloadPNG = async () => {
+    if (!data || !isClient) return
+
+    try {
+      const QRCodeStyling = (await import('qr-code-styling')).default
+
+      const qrOptions: ConstructorParameters<typeof QRCodeStyling>[0] = {
+        width: options.size,
+        height: options.size,
+        data: data,
+        margin: 8,
+        dotsOptions: {
+          color: options.color,
+          type: mapDotStyle(options.dotStyle) as 'square' | 'rounded' | 'dots' | 'classy' | 'classy-rounded' | 'extra-rounded',
+        },
+        cornersSquareOptions: {
+          color: options.cornerColor,
+          type: mapCornerFrameStyle(options.cornerFrameStyle) as 'square' | 'extra-rounded' | 'dot',
+        },
+        cornersDotOptions: {
+          color: options.cornerDotColor,
+          type: mapCornerDotStyle(options.cornerDotStyle) as 'square' | 'dot',
+        },
+        backgroundOptions: {
+          color: options.bgColor,
+        },
+        qrOptions: {
+          errorCorrectionLevel: options.logo ?
+            (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
+            options.errorCorrection,
+        },
+      }
+
+      if (options.logo) {
+        qrOptions.image = options.logo
+        qrOptions.imageOptions = {
+          crossOrigin: 'anonymous',
+          margin: options.logoPadding,
+          imageSize: 0.4,
+          hideBackgroundDots: true,
         }
       }
-    })
-  }, [displayData, options, compact, drawLogo])
+
+      const downloadQR = new QRCodeStyling(qrOptions)
+      await downloadQR.download({
+        name: `qrcode-${type}-${options.size}px-${Date.now()}`,
+        extension: 'png',
+      })
+    } catch (err) {
+      console.error('Download error:', err)
+    }
+  }
+
+  const downloadSVG = async () => {
+    if (!data || !isClient) return
+
+    try {
+      const QRCodeStyling = (await import('qr-code-styling')).default
+
+      const qrOptions: ConstructorParameters<typeof QRCodeStyling>[0] = {
+        width: options.size,
+        height: options.size,
+        data: data,
+        margin: 8,
+        type: 'svg',
+        dotsOptions: {
+          color: options.color,
+          type: mapDotStyle(options.dotStyle) as 'square' | 'rounded' | 'dots' | 'classy' | 'classy-rounded' | 'extra-rounded',
+        },
+        cornersSquareOptions: {
+          color: options.cornerColor,
+          type: mapCornerFrameStyle(options.cornerFrameStyle) as 'square' | 'extra-rounded' | 'dot',
+        },
+        cornersDotOptions: {
+          color: options.cornerDotColor,
+          type: mapCornerDotStyle(options.cornerDotStyle) as 'square' | 'dot',
+        },
+        backgroundOptions: {
+          color: options.bgColor,
+        },
+        qrOptions: {
+          errorCorrectionLevel: options.logo ?
+            (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
+            options.errorCorrection,
+        },
+      }
+
+      if (options.logo) {
+        qrOptions.image = options.logo
+        qrOptions.imageOptions = {
+          crossOrigin: 'anonymous',
+          margin: options.logoPadding,
+          imageSize: 0.4,
+          hideBackgroundDots: true,
+        }
+      }
+
+      const downloadQR = new QRCodeStyling(qrOptions)
+      await downloadQR.download({
+        name: `qrcode-${type}-${options.size}px-${Date.now()}`,
+        extension: 'svg',
+      })
+    } catch (err) {
+      console.error('Download error:', err)
+    }
+  }
 
   // Compact mode for mobile sticky preview
   if (compact) {
@@ -94,138 +251,27 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
             <div className="w-[80px] h-[80px] bg-slate-100 rounded flex items-center justify-center">
               <span className="text-xs text-slate-400">Fehler</span>
             </div>
+          ) : !isClient ? (
+            <div className="w-[80px] h-[80px] bg-slate-100 rounded animate-pulse" />
           ) : (
-            <canvas ref={canvasRef} className="rounded shadow-sm" />
+            <div ref={containerRef} className="rounded shadow-sm [&>canvas]:rounded [&>svg]:rounded" />
           )}
         </div>
         <div className="flex-1 min-w-0">
           {isPreview ? (
-            <p className="text-sm text-slate-500">
-              Live-Vorschau
-            </p>
+            <p className="text-sm text-slate-500">Live-Vorschau</p>
           ) : (
-            <p className="text-sm font-medium text-green-600">
-              QR-Code bereit!
-            </p>
+            <p className="text-sm font-medium text-green-600">QR-Code bereit!</p>
           )}
-          <p className="text-xs text-slate-400 truncate">
-            {options.size}×{options.size}px
-          </p>
+          <p className="text-xs text-slate-400 truncate">{options.size}×{options.size}px</p>
         </div>
       </div>
     )
   }
 
   // Full preview mode
-  const downloadPNG = async () => {
-    if (!data) return
-
-    const downloadCanvas = document.createElement('canvas')
-    downloadCanvas.width = options.size
-    downloadCanvas.height = options.size
-
-    const errorLevel = options.logo ?
-      (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
-      options.errorCorrection
-
-    const qrOptions = {
-      width: options.size,
-      margin: 2,
-      color: {
-        dark: options.color,
-        light: options.bgColor,
-      },
-      errorCorrectionLevel: errorLevel,
-    }
-
-    try {
-      await QRCode.toCanvas(downloadCanvas, data, qrOptions)
-
-      if (options.logo) {
-        const ctx = downloadCanvas.getContext('2d')
-        if (ctx) {
-          const img = new Image()
-          img.crossOrigin = 'anonymous'
-          await new Promise<void>((resolve) => {
-            img.onload = () => {
-              const canvasSize = downloadCanvas.width
-              const logoSize = options.logoSize
-              const padding = options.logoPadding
-              const totalSize = logoSize + padding * 2
-              const x = (canvasSize - totalSize) / 2
-              const y = (canvasSize - totalSize) / 2
-
-              ctx.fillStyle = options.logoBackgroundColor
-              ctx.beginPath()
-              ctx.roundRect(x, y, totalSize, totalSize, 8)
-              ctx.fill()
-              ctx.drawImage(img, x + padding, y + padding, logoSize, logoSize)
-              resolve()
-            }
-            img.src = options.logo!
-          })
-        }
-      }
-
-      const link = document.createElement('a')
-      link.download = `qrcode-${type}-${options.size}px-${Date.now()}.png`
-      link.href = downloadCanvas.toDataURL('image/png')
-      link.click()
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const downloadSVG = async () => {
-    if (!data) return
-
-    const errorLevel = options.logo ?
-      (options.errorCorrection === 'L' ? 'M' : options.errorCorrection) :
-      options.errorCorrection
-
-    const qrOptions = {
-      width: options.size,
-      margin: 2,
-      color: {
-        dark: options.color,
-        light: options.bgColor,
-      },
-      errorCorrectionLevel: errorLevel,
-      type: 'svg' as const,
-    }
-
-    try {
-      let svg = await QRCode.toString(data, qrOptions)
-
-      if (options.logo) {
-        const logoSize = options.logoSize
-        const padding = options.logoPadding
-        const totalSize = logoSize + padding * 2
-        const x = (options.size - totalSize) / 2
-        const y = (options.size - totalSize) / 2
-
-        const logoElements = `
-          <rect x="${x}" y="${y}" width="${totalSize}" height="${totalSize}" rx="8" fill="${options.logoBackgroundColor}"/>
-          <image x="${x + padding}" y="${y + padding}" width="${logoSize}" height="${logoSize}" href="${options.logo}"/>
-        `
-        svg = svg.replace('</svg>', logoElements + '</svg>')
-      }
-
-      const blob = new Blob([svg], { type: 'image/svg+xml' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.download = `qrcode-${type}-${options.size}px-${Date.now()}.svg`
-      link.href = url
-      link.click()
-      URL.revokeObjectURL(url)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   return (
     <div className="card text-center relative">
-      {/* Preview Badge - outside the QR code */}
       {isPreview && (
         <div className="mb-3">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
@@ -248,15 +294,16 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
             </svg>
             <p>{error}</p>
           </div>
+        ) : !isClient ? (
+          <div className="w-[300px] h-[300px] bg-slate-100 rounded-lg animate-pulse" />
         ) : (
-          <canvas
-            ref={canvasRef}
-            className={`max-w-full h-auto rounded-lg ${isPreview ? 'opacity-50' : ''}`}
+          <div
+            ref={containerRef}
+            className={`[&>canvas]:rounded-lg [&>svg]:rounded-lg ${isPreview ? 'opacity-50' : ''}`}
           />
         )}
       </div>
 
-      {/* Info line */}
       <p className="text-xs text-slate-500 mb-4">
         {isPreview ? (
           <>Geben Sie Ihre Daten ein um einen QR-Code zu erstellen</>
@@ -265,7 +312,6 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         )}
       </p>
 
-      {/* Download buttons */}
       {data && !error && (
         <div className="flex flex-col gap-3">
           <button onClick={downloadPNG} className="btn-success w-full">
@@ -279,7 +325,6 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         </div>
       )}
 
-      {/* Call to action when in preview mode */}
       {isPreview && (
         <button
           onClick={() => {
