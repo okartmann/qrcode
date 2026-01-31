@@ -419,17 +419,6 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         </div>
       )}
 
-      {isPreview && (
-        <button
-          onClick={() => {
-            const form = document.querySelector('input, textarea')
-            if (form instanceof HTMLElement) form.focus()
-          }}
-          className="btn-primary w-full"
-        >
-          Jetzt QR-Code erstellen
-        </button>
-      )}
     </div>
   )
 }
