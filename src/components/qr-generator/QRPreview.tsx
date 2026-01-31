@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { QROptions, QRCodeType, DotStyle, CornerFrameStyle, CornerDotStyle } from '@/types/qr'
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
+import { QRCodeFrame } from './QRCodeFrame'
 
 interface QRPreviewProps {
   data: string | null
@@ -50,6 +51,7 @@ const mapCornerDotStyle = (style: CornerDotStyle): string => {
 
 export function QRPreview({ data, options, type, compact = false }: QRPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const frameContainerRef = useRef<HTMLDivElement>(null)
   const qrCodeRef = useRef<InstanceType<typeof import('qr-code-styling').default> | null>(null)
   const [isClient, setIsClient] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -139,6 +141,30 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
     if (!data || !isClient) return
 
     try {
+      // If frame is enabled, use html2canvas to capture the full frame
+      if (options.frameStyle !== 'none' && frameContainerRef.current) {
+        const html2canvas = (await import('html2canvas')).default
+
+        // Calculate scale factor for high-quality output
+        const previewSize = Math.min(options.size, 300)
+        const scale = options.size / previewSize
+
+        const canvas = await html2canvas(frameContainerRef.current, {
+          backgroundColor: null,
+          scale: scale * 2, // 2x for retina quality
+          logging: false,
+          useCORS: true,
+        })
+
+        // Download the canvas
+        const link = document.createElement('a')
+        link.download = `qrcode-${type}-${options.size}px-${Date.now()}.png`
+        link.href = canvas.toDataURL('image/png')
+        link.click()
+        return
+      }
+
+      // Otherwise, use qr-code-styling native download
       const QRCodeStyling = (await import('qr-code-styling')).default
 
       const qrOptions: ConstructorParameters<typeof QRCodeStyling>[0] = {
@@ -192,6 +218,30 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
     if (!data || !isClient) return
 
     try {
+      // If frame is enabled, convert html2canvas to data URL (SVG export with frames is limited)
+      if (options.frameStyle !== 'none' && frameContainerRef.current) {
+        const html2canvas = (await import('html2canvas')).default
+
+        // Calculate scale factor for high-quality output
+        const previewSize = Math.min(options.size, 300)
+        const scale = options.size / previewSize
+
+        const canvas = await html2canvas(frameContainerRef.current, {
+          backgroundColor: null,
+          scale: scale * 2,
+          logging: false,
+          useCORS: true,
+        })
+
+        // For framed QR codes, download as PNG since SVG with frames is complex
+        const link = document.createElement('a')
+        link.download = `qrcode-${type}-${options.size}px-${Date.now()}.png`
+        link.href = canvas.toDataURL('image/png')
+        link.click()
+        return
+      }
+
+      // Without frame, use native SVG export
       const QRCodeStyling = (await import('qr-code-styling')).default
 
       const qrOptions: ConstructorParameters<typeof QRCodeStyling>[0] = {
@@ -297,10 +347,20 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         ) : !isClient ? (
           <div className="w-[300px] h-[300px] bg-slate-100 rounded-lg animate-pulse" />
         ) : (
-          <div
-            ref={containerRef}
-            className={`[&>canvas]:rounded-lg [&>svg]:rounded-lg ${isPreview ? 'opacity-50' : ''}`}
-          />
+          <div ref={frameContainerRef}>
+            <QRCodeFrame
+              frameStyle={options.frameStyle}
+              frameColor={options.frameColor}
+              frameText={options.frameText}
+              size={Math.min(options.size, 300)}
+              bgColor={options.bgColor}
+            >
+              <div
+                ref={containerRef}
+                className={`[&>canvas]:rounded-lg [&>svg]:rounded-lg ${isPreview ? 'opacity-50' : ''}`}
+              />
+            </QRCodeFrame>
+          </div>
         )}
       </div>
 
