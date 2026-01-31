@@ -16,6 +16,7 @@ import { PayPalForm } from './forms/PayPalForm'
 import { BitcoinForm } from './forms/BitcoinForm'
 import { QRPreview } from './QRPreview'
 import { QRCustomization } from './QRCustomization'
+import { EyeIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import type {
   QRCodeType,
   QROptions,
@@ -47,6 +48,7 @@ import {
 export function QRGenerator() {
   const [activeType, setActiveType] = useState<QRCodeType>('url')
   const [qrData, setQrData] = useState<string | null>(null)
+  const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [options, setOptions] = useState<QROptions>({
     size: 300,
     color: '#000000',
@@ -179,6 +181,10 @@ export function QRGenerator() {
     }
 
     setQrData(data)
+    // Show preview on mobile after generating
+    if (data && window.innerWidth < 1024) {
+      setShowMobilePreview(true)
+    }
   }, [activeType, urlValue, textValue, wifiData, vcardData, emailData, phoneValue, smsData, whatsappData, locationData, eventData, paypalData, bitcoinData])
 
   const handleTypeChange = (type: QRCodeType) => {
@@ -187,66 +193,126 @@ export function QRGenerator() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
-      {/* Left Column - Options */}
-      <div className="card">
-        <h2 className="text-2xl font-bold mb-6">QR-Code erstellen</h2>
+    <>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+        {/* Left Column - Options */}
+        <div className="card">
+          <h2 className="text-2xl font-bold mb-6">QR-Code erstellen</h2>
 
-        <TypeSelector activeType={activeType} onTypeChange={handleTypeChange} />
+          <TypeSelector activeType={activeType} onTypeChange={handleTypeChange} />
 
-        <div className="mt-6">
-          {activeType === 'url' && (
-            <URLForm value={urlValue} onChange={setUrlValue} />
-          )}
-          {activeType === 'text' && (
-            <TextForm value={textValue} onChange={setTextValue} />
-          )}
-          {activeType === 'wifi' && (
-            <WiFiForm data={wifiData} onChange={setWifiData} />
-          )}
-          {activeType === 'vcard' && (
-            <VCardForm data={vcardData} onChange={setVcardData} />
-          )}
-          {activeType === 'email' && (
-            <EmailForm data={emailData} onChange={setEmailData} />
-          )}
-          {activeType === 'phone' && (
-            <PhoneForm value={phoneValue} onChange={setPhoneValue} />
-          )}
-          {activeType === 'sms' && (
-            <SMSForm data={smsData} onChange={setSmsData} />
-          )}
-          {activeType === 'whatsapp' && (
-            <WhatsAppForm data={whatsappData} onChange={setWhatsappData} />
-          )}
-          {activeType === 'location' && (
-            <LocationForm data={locationData} onChange={setLocationData} />
-          )}
-          {activeType === 'event' && (
-            <EventForm data={eventData} onChange={setEventData} />
-          )}
-          {activeType === 'paypal' && (
-            <PayPalForm data={paypalData} onChange={setPaypalData} />
-          )}
-          {activeType === 'bitcoin' && (
-            <BitcoinForm data={bitcoinData} onChange={setBitcoinData} />
-          )}
+          <div className="mt-6">
+            {activeType === 'url' && (
+              <URLForm value={urlValue} onChange={setUrlValue} />
+            )}
+            {activeType === 'text' && (
+              <TextForm value={textValue} onChange={setTextValue} />
+            )}
+            {activeType === 'wifi' && (
+              <WiFiForm data={wifiData} onChange={setWifiData} />
+            )}
+            {activeType === 'vcard' && (
+              <VCardForm data={vcardData} onChange={setVcardData} />
+            )}
+            {activeType === 'email' && (
+              <EmailForm data={emailData} onChange={setEmailData} />
+            )}
+            {activeType === 'phone' && (
+              <PhoneForm value={phoneValue} onChange={setPhoneValue} />
+            )}
+            {activeType === 'sms' && (
+              <SMSForm data={smsData} onChange={setSmsData} />
+            )}
+            {activeType === 'whatsapp' && (
+              <WhatsAppForm data={whatsappData} onChange={setWhatsappData} />
+            )}
+            {activeType === 'location' && (
+              <LocationForm data={locationData} onChange={setLocationData} />
+            )}
+            {activeType === 'event' && (
+              <EventForm data={eventData} onChange={setEventData} />
+            )}
+            {activeType === 'paypal' && (
+              <PayPalForm data={paypalData} onChange={setPaypalData} />
+            )}
+            {activeType === 'bitcoin' && (
+              <BitcoinForm data={bitcoinData} onChange={setBitcoinData} />
+            )}
+          </div>
+
+          <QRCustomization options={options} onChange={setOptions} />
+
+          <button onClick={generateQRCode} className="btn-primary w-full mt-6">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            QR-Code generieren
+          </button>
         </div>
 
-        <QRCustomization options={options} onChange={setOptions} />
+        {/* Right Column - Preview (Desktop) */}
+        <div className="hidden lg:block lg:sticky lg:top-24">
+          <QRPreview data={qrData} options={options} type={activeType} />
+        </div>
+      </div>
 
-        <button onClick={generateQRCode} className="btn-primary w-full mt-6">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          QR-Code generieren
+      {/* Mobile Preview Button - Fixed at bottom */}
+      <div className="fixed bottom-4 right-4 lg:hidden z-40">
+        <button
+          onClick={() => setShowMobilePreview(true)}
+          className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-colors"
+        >
+          <EyeIcon className="w-5 h-5" />
+          <span className="font-medium">Vorschau</span>
+          {qrData && (
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          )}
         </button>
       </div>
 
-      {/* Right Column - Preview */}
-      <div className="lg:sticky lg:top-24">
-        <QRPreview data={qrData} options={options} type={activeType} />
-      </div>
-    </div>
+      {/* Mobile Preview Modal */}
+      {showMobilePreview && (
+        <div className="fixed inset-0 bg-black/50 z-50 lg:hidden flex items-end">
+          <div
+            className="absolute inset-0"
+            onClick={() => setShowMobilePreview(false)}
+          />
+          <div className="relative w-full bg-white rounded-t-2xl max-h-[85vh] overflow-y-auto animate-slideUp">
+            {/* Handle bar */}
+            <div className="sticky top-0 bg-white pt-3 pb-2 border-b border-slate-100 z-10">
+              <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-2" />
+              <div className="flex items-center justify-between px-4">
+                <h3 className="font-semibold text-slate-800">QR-Code Vorschau</h3>
+                <button
+                  onClick={() => setShowMobilePreview(false)}
+                  className="p-2 text-slate-500 hover:text-slate-700 rounded-lg hover:bg-slate-100"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4">
+              <QRPreview data={qrData} options={options} type={activeType} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add animation styles */}
+      <style jsx global>{`
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+      `}</style>
+    </>
   )
 }

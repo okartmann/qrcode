@@ -604,8 +604,8 @@ export function QRCustomization({ options, onChange }: QRCustomizationProps) {
           <input
             type="range"
             min="128"
-            max="512"
-            step="8"
+            max="4096"
+            step="32"
             value={options.size}
             onChange={(e) => onChange({ ...options, size: parseInt(e.target.value) })}
             className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
@@ -616,8 +616,14 @@ export function QRCustomization({ options, onChange }: QRCustomizationProps) {
           />
           <div className="flex justify-between text-xs text-slate-500 mt-1">
             <span>Klein (128px)</span>
-            <span>Groß (512px)</span>
+            <span>Mittel (1024px)</span>
+            <span>Groß (4096px)</span>
           </div>
+          {options.size > 1024 && (
+            <p className="text-xs text-amber-600 mt-2">
+              Hinweis: Größere QR-Codes benötigen mehr Speicherplatz und Ladezeit.
+            </p>
+          )}
         </div>
 
         {/* Error Correction */}
