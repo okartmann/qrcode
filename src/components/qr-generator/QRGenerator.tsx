@@ -192,6 +192,30 @@ export function QRGenerator() {
     setQrData(null)
   }
 
+  const handleReset = () => {
+    // Reset all form values
+    setUrlValue('')
+    setTextValue('')
+    setWifiData({ ssid: '', password: '', encryption: 'WPA', hidden: false })
+    setVcardData({
+      name: '', firstName: '', lastName: '', phone: '', mobile: '',
+      email: '', company: '', jobTitle: '', website: '',
+      address: '', city: '', zip: '', country: '', note: '',
+    })
+    setEmailData({ address: '', subject: '', body: '' })
+    setPhoneValue('')
+    setSmsData({ phone: '', message: '' })
+    setWhatsappData({ phone: '', message: '' })
+    setLocationData({ latitude: '', longitude: '', query: '' })
+    setEventData({
+      title: '', location: '', startDate: '', startTime: '',
+      endDate: '', endTime: '', description: '', allDay: false,
+    })
+    setPaypalData({ email: '', itemName: '', price: '', currency: 'EUR' })
+    setBitcoinData({ address: '', amount: '', label: '', message: '' })
+    setQrData(null)
+  }
+
   return (
     <>
       {/* Mobile Sticky Preview Bar - Always visible at top */}
@@ -217,7 +241,20 @@ export function QRGenerator() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start mt-4 lg:mt-0">
         {/* Left Column - Options */}
         <div className="card">
-          <h2 className="text-2xl font-bold mb-6">QR-Code erstellen</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">QR-Code erstellen</h2>
+            {qrData && (
+              <button
+                onClick={handleReset}
+                className="text-sm text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Zurücksetzen
+              </button>
+            )}
+          </div>
 
           <TypeSelector activeType={activeType} onTypeChange={handleTypeChange} />
 
