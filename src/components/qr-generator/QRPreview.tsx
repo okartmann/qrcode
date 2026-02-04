@@ -60,7 +60,7 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
   const isPreview = !data
 
   // Create a unique key based on QR-relevant options (not frame options)
-  const qrKey = `${displayData}-${options.color}-${options.bgColor}-${options.dotStyle}-${options.cornerFrameStyle}-${options.cornerDotStyle}-${options.cornerColor}-${options.cornerDotColor}-${options.logo || 'nologo'}-${options.errorCorrection}-${compact}`
+  const qrKey = `${displayData}-${options.color}-${options.bgColor}-${options.dotStyle}-${options.cornerFrameStyle}-${options.cornerDotStyle}-${options.cornerColor}-${options.cornerDotColor}-${options.logo || 'nologo'}-${options.logoSize}-${options.logoPadding}-${options.errorCorrection}-${compact}`
 
   // Initialize on client side only
   useEffect(() => {
@@ -120,11 +120,13 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
         // Add logo if present
         if (options.logo) {
           const scaleFactor = size / options.size
+          // Convert logoSize (pixels) to ratio (0-1) relative to QR code size
+          const logoRatio = options.logoSize / options.size
           qrOptions.image = options.logo
           qrOptions.imageOptions = {
             crossOrigin: 'anonymous',
             margin: Math.round(options.logoPadding * scaleFactor),
-            imageSize: 0.4,
+            imageSize: logoRatio,
             hideBackgroundDots: true,
           }
         }
@@ -220,11 +222,12 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
       }
 
       if (options.logo) {
+        const logoRatio = options.logoSize / options.size
         qrOptions.image = options.logo
         qrOptions.imageOptions = {
           crossOrigin: 'anonymous',
           margin: options.logoPadding,
-          imageSize: 0.4,
+          imageSize: logoRatio,
           hideBackgroundDots: true,
         }
       }
@@ -298,11 +301,12 @@ export function QRPreview({ data, options, type, compact = false }: QRPreviewPro
       }
 
       if (options.logo) {
+        const logoRatio = options.logoSize / options.size
         qrOptions.image = options.logo
         qrOptions.imageOptions = {
           crossOrigin: 'anonymous',
           margin: options.logoPadding,
-          imageSize: 0.4,
+          imageSize: logoRatio,
           hideBackgroundDots: true,
         }
       }
