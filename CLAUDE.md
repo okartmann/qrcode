@@ -27,6 +27,7 @@ No test framework is configured yet.
 QRGenerator (src/components/qr-generator/QRGenerator.tsx)
 ├── Manages all state: activeType, qrData, options, form data
 ├── Auto-generates QR code via useEffect when inputs change
+├── handleReset() - Clears all form fields across all QR types
 │
 ├── TypeSelector - Switches between 12 QR types
 ├── Form Components (forms/*.tsx) - One per QR type
@@ -57,9 +58,27 @@ Dot styles map to qr-code-styling types in `QRPreview.tsx`:
 
 Frame templates defined in `qr.ts` are rendered by `QRCodeFrame.tsx` using CSS/SVG.
 
+**Logo sizing:** `logoSize` is stored in pixels (30-100), converted to ratio for qr-code-styling:
+```typescript
+const logoRatio = options.logoSize / options.size
+```
+
+### Race Condition Handling
+
+QRPreview uses `renderIdRef` to prevent stale async renders:
+```typescript
+renderIdRef.current += 1
+const currentRenderId = renderIdRef.current
+// ... async work ...
+if (currentRenderId !== renderIdRef.current) return
+```
+
+A `qrKey` string triggers React re-renders when QR-relevant options change.
+
 ## Development Notes
 
 - All QR generation is client-side (`'use client'` components)
 - Path alias: `@/*` maps to `./src/*`
 - Language: German (de_DE) - UI text, legal pages, metadata
 - Mobile: Sticky preview bar at top, responsive grid layout
+- Preview shows "Live-Vorschau mit Beispieldaten" (amber) when no data, "Live-Vorschau" (green) with data
